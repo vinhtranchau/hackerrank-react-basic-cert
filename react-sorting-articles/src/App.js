@@ -1,51 +1,63 @@
-import React, { useState, useEffect } from 'react'
-import './App.css'
-import 'h8k-components'
+import React from 'react';
+import './App.css';
+import 'h8k-components';
 
-import Articles from './components/Articles'
+import Articles from './components/Articles';
 
-const title = 'Sorting Articles'
+const title = "Sorting Articles";
 
-function App({ articles }) {
-  const [flag, setFlag] = useState(true)
-  const sortedVotes = () => {
-    let res
-    articles.sort((a, b) =>
-      a.upvotes > b.upvotes ? -1 : b.upvotes > a.upvotes ? 1 : 0
-    )
-    res = articles
-    return res
-  }
-  const sortedDate = () => {
-    let res
-    articles.sort((a, b) => (a.date > b.date ? -1 : b.date > a.date ? 1 : 0))
-    res = articles
-    return res
-  }
-  useEffect(() => {}, [flag])
-  return (
-    <div className='App'>
-      <h8k-navbar header={title}></h8k-navbar>
-      <div className='layout-row align-items-center justify-content-center my-20 navigation'>
-        <label className='form-hint mb-0 text-uppercase font-weight-light'>
-          Sort By
-        </label>
-        <button
-          data-testid='most-upvoted-link'
-          className='small'
-          onClick={() => setFlag(true)}>
-          Most Upvoted
-        </button>
-        <button
-          data-testid='most-recent-link'
-          className='small'
-          onClick={() => setFlag(false)}>
-          Most Recent
-        </button>
-      </div>
-      <Articles articles={flag ? sortedVotes() : sortedDate()} />
-    </div>
-  )
+function App({articles}) {
+    const [articlesList, setArticlesList] = React.useState(articles);
+    
+    React.useEffect(() => {
+        sortByUpvote(articles);
+    },[]);
+
+    
+    const sortByUpvote = () => {
+      let ret = articlesList.slice();
+      ret.sort((article_st, article_nd) => {
+        if (article_st.upvotes > article_nd.upvotes) {
+          return -1;
+        }
+        if (article_st.upvotes < article_nd.upvotes) {
+          return 1;
+        }
+        return 0;
+      })
+
+      setArticlesList(ret);
+    }
+
+    const sortByDate = () => {
+      let ret = articlesList.slice();
+      ret.sort((article_st, article_nd) => {
+        const stDate = new Date(article_st.date);
+        const ndDate = new Date(article_nd.date);
+        if (stDate > ndDate) {
+          return -1;
+        }
+        if (stDate < ndDate) {
+          return 1;
+        }
+        return 0;
+      })
+
+      setArticlesList(ret);
+    }
+
+    return (
+        <div className="App">
+            <h8k-navbar header={title}></h8k-navbar>
+            <div className="layout-row align-items-center justify-content-center my-20 navigation">
+                <label className="form-hint mb-0 text-uppercase font-weight-light">Sort By</label>
+                <button data-testid="most-upvoted-link" className="small" onClick={() => sortByUpvote()}>Most Upvoted</button>
+                <button data-testid="most-recent-link" className="small" onClick={() => sortByDate()}>Most Recent</button>
+            </div>
+            <Articles articles={articlesList}/>
+        </div>
+    );
+
 }
 
-export default App
+export default App;
